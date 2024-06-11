@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>The Soccer Spot</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+    	<style>
+     	 header {
+  	  background-color: #ebe3fc;
+  	  background-position: center;
+  	  background-size: contain;
+  	  padding: 40px;
+  	  text-align: center;
+  	  border-radius: 5px 5px 0 0;
+      	}
+	 body {
+        background-image: url('Background.jpg');
+        background-size: cover;
+        background-position: 0% 0%;
+        background-repeat: no-repeat;
+       	}
+       table {
+        position: absolute;
+        top: 200px;
+        left: 50px;
+        width: 300px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 18px;
+      }
+      th {
+        text-align: centre;
+        padding: 10px;
+      }
+
+      td {
+        padding: 10px;
+      }
+
+      a {
+        color: white;
+        text-decoration: none;
+      }
+
+      img {
+        height: 50px;
+        width: 50px;
+        margin-right: 10px;
+      }
+    	</style>
+</head>
+<body>
+	<header>
+		<img src="logo.png" alt="Header" style="width: 17%; height: 10%;">
+	</header>
+	<style>
+  		df-messenger {
+   		--df-messenger-bot-message: #bfa2fa;
+  		--df-messenger-button-titlebar-color: #ad7cf7;
+   		--df-messenger-chat-background-color: #f6f2fc;
+   		--df-messenger-font-color: black;
+   		--df-messenger-send-icon: #ad7cf7;
+   		--df-messenger-user-message: #ebe3fc;
+  		}
+	</style>
+
+	<div>
+		<script src="https://www.gstatic.com/dialogflow-console/fast/messenger-cx/bootstrap.js?v=1">
+		</script>
+
+		<df-messenger
+  			df-cx="true"
+  			location="europe-west2"
+  			chat-title="Chat with Lisa"
+  			agent-id="161c7549-823f-4174-9296-7202c83401a7"
+  			language-code="en">
+		</df-messenger>
+
+	</div>
+	
+  		<table>
+    			<thead>
+      			<tr>
+        				<th colspan="6">2022 Premier League Teams</th>
+      			</tr>
+    			</thead>
+    			<tbody>
+      			<tr>
+        				<td><img src="Manchester United.jpg" alt="Manchester United Logo"></td>
+        				<td><a href="https://www.manutd.com/">Manchester United</a></td>
+        				<td><img src="Arsenal.jpg" alt="Arsenal Logo"></td>
+        				<td><a href="https://www.arsenal.com/">Arsenal</a></td>
+        				<td><img src="Brighton.jpg" alt="Brighton Logo"></td>
+        				<td><a href="https://www.brightonandhovealbion.com/">Brighton</a></td>
+      			</tr>
+      			<tr>
+        				<td><img src="Newcastle.jpg" alt="Newcastle Logo"></td>
+        				<td><a href="https://www.nufc.co.uk/">Newcastle</a></td>
+        				<td><img src="Everton.jpg" alt="Everton Logo"></td>
+        				<td><a href="https://www.evertonfc.com/">Everton</a></td>
+        				<td><img src="Crystal Palace.jpg" alt="Crystal Palace Logo"></td>
+        				<td><a href="https://www.cpfc.co.uk/">Crystal Palace</a></td>
+      			</tr>
+      			<tr>
+        				<td><img src="Bournemouth.jpg" alt="Bournemouth Logo"></td>
+        				<td><a href="https://www.afcb.co.uk/">Bournemouth</a></td>
+        				<td><img src="Leicester.jpg" alt="Leicester Logo"></td>
+        				<td><a href="https://www.lcfc.com/?lang=en">Leicester</a></td>
+        				<td><img src="Brentford.jpg" alt="Brentford Logo"></td>
+        				<td><a href="https://www.brentfordfc.com/?lang=en">Brentford</a></td>
+      			</tr>
+      			<tr>
+        				<td><img src="Fulham.jpg" alt="Fulham Logo"></td>
+        				<td><a href="https://www.fulhamfc.com/">Fulham</a></td>
+        				<td><img src="Tottenham.jpg" alt="Tottenham Logo"></td>
+        				<td><a href="https://www.tottenhamhotspur.com/">Tottenham</a></td>
+        				<td><img src="Leeds.jpg" alt="Leeds Logo"></td>
+        				<td><a href="https://www.leedsunited.com/">Leeds</a></td>
+      			</tr>  
+      			<tr>
+        				<td><img src="Wolves.jpg" alt="Wolves Logo"></td>
+        				<td><a href="https://www.wolves.co.uk/">Wolves</a></td>
+        				<td><img src="West Ham.jpg" alt="West Ham Logo"></td>
+        				<td><a href="https://www.whufc.com/">West Ham</a></td>
+        				<td><img src="Nottingham Forest.jpg" alt="Nottingham Forest Logo"></td>
+        				<td><a href="https://www.nottinghamforest.co.uk/">Nottingham Forest</a></td>
+      			</tr>  
+      			<tr>
+        				<td><img src="Liverpool.jpg" alt="Liverpool Logo"></td>
+        				<td><a href="https://www.liverpoolfc.com/">Liverpool</a></td>
+        				<td><img src="Chelsea.jpg" alt="Chelsea Logo"></td>
+        				<td><a href="https://www.chelseafc.com/en">Chelsea</a></td>
+        				<td><img src="Aston Villa.jpg" alt="Aston Villa Logo"></td>
+        				<td><a href="https://www.avfc.co.uk/">Aston Villa</a></td>
+      			</tr>  
+      			<tr>
+        				<td><img src="Southampton.jpg" alt="Southampton Logo"></td>
+        				<td><a href="https://www.southamptonfc.com/">Southampton</a></td>
+        				<td><img src="Manchester City.jpg" alt="Manchester City Logo"></td>
+        				<td><a href="https://www.mancity.com/">Manchester City</a></td>
+      			</tr>  
+    
+    			</tbody>
+  		</table>
+
+	<script src="script.js"></script>
+</body>
+</html>
