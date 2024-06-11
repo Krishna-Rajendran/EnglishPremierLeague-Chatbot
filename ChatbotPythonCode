@@ -1,0 +1,251 @@
+import http.client
+import json
+import urllib.parse
+import random
+from datetime import date, datetime
+import google.cloud.logging
+client = google.cloud.logging.Client()
+client.setup_logging()
+import logging
+
+def hello_world(request):
+    conn = http.client.HTTPSConnection("api-football-v1.p.rapidapi.com")
+
+    headers = {
+        'x-rapidapi-host': "api-football-v1.p.rapidapi.com",
+        'x-rapidapi-key': "95e7a9a227msh49122f3c790ac84p1d22e9jsn65ed200aee1f"
+        }
+
+    # Get the parameter value from the request body
+    request_json = request.get_json()
+    logging.info(request_json)
+    
+    # Creating the team dictionary
+    teams_dict = {
+        33: 'Manchester United',
+        34: 'Newcastle',
+        35: 'Bournemouth',
+        36: 'Fulham',
+        39: 'Wolves',
+        40: 'Liverpool',
+        41: 'Southampton',
+        42: 'Arsenal',
+        45: 'Everton',
+        46: 'Leicester',
+        47: 'Tottenham',
+        48: 'West Ham',
+        49: 'Chelsea',
+        50: 'Manchester City',
+        51: 'Brighton',
+        52: 'Crystal Palace',
+        55: 'Brentford',
+        63: 'Leeds',
+        65: 'Nottingham Forest',
+        66: 'Aston Villa'}
+    
+    # Getting team name from the dialogflow
+    teamName = request_json['sessionInfo']['parameters']['teams']
+
+    # Iterate through the dictionary items and check for the value
+    for _id, value in teams_dict.items():
+        if value == teamName:
+            team_id = _id
+        else:
+            response_text = 'Sorry, I am afraid that ' + teamName + ' is not playing in this season.'
+
+    # params for the query string
+    params = {
+        'team':team_id,
+        'league':'39',
+        'season':'2022'
+    }        
+
+    query_string = urllib.parse.urlencode(params)
+
+   
+    parameter_list = request_json['intentInfo']['parameters']
+
+    # For manager info
+    if 'manager' in parameter_list:
+        conn.request("GET", f"/v3/coachs?team={team_id}", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        manager_data = json.loads(data)['response']
+
+        manager_detail = manager_data[0]
+        firstname = manager_detail.get('firstname')
+        lastname = manager_detail.get('lastname')
+        manager_name = firstname + " " + lastname
+        response_text1 = 'The manager of the team is ' + manager_name + '.'
+        response_text2 = teamName + 'is managed by ' + manager_name + '.'
+        response_text3 = manager_name + 'is the manager of ' + teamName + '.'
+        response_text = random.choice([response_text1, response_text2, response_text3])
+
+    # For lastscore info
+    elif 'lastscore' in parameter_list:
+        conn.request("GET", f"/v3/fixtures?{query_string}&last=1&status=FT", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        last_game_fixture_data = json.loads(data)['response']
+        
+        last_game_fixture_data1 = last_game_fixture_data[0]
+        last_opponent_detail = last_game_fixture_data1.get('teams')
+        last_opponent_detail1 = last_opponent_detail.get('home')
+        last_opponent_detail2 = last_opponent_detail.get('away')
+        home_team = last_opponent_detail1.get('name')
+        away_team = last_opponent_detail2.get('name')
+
+
+        last_score_detail = last_game_fixture_data1.get('score')
+        last_score_detail1 = last_score_detail.get('fulltime')
+        home_score = str(last_score_detail1.get('home'))
+        away_score = str(last_score_detail1.get('away'))
+        response_text1 = 'The last match was between ' + home_team + '-' + away_team + ' and the score was ' + home_score + '-' + away_score + '.'
+        response_text2 = 'The score for the last game between ' + home_team + ' and ' + away_team + ' was ' + home_score + '-' + away_score + '.'
+        response_text3 = home_team + ' played against ' + away_team + ' in the previous match and the final score was ' + home_score + '-' + away_score + '.'
+        response_text = random.choice([response_text1, response_text2, response_text3])
+
+    # For lastopponent info
+    elif 'lastopponent' in parameter_list:
+        conn.request("GET", f"/v3/fixtures?{query_string}&last=1&status=FT", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        last_game_fixture_data = json.loads(data)['response']
+        
+        last_game_fixture_data1 = last_game_fixture_data[0]
+        last_opponent_detail = last_game_fixture_data1.get('teams')
+        last_opponent_detail1 = last_opponent_detail.get('home')
+        last_opponent_detail2 = last_opponent_detail.get('away')
+        home_team = last_opponent_detail1.get('name')
+        away_team = last_opponent_detail2.get('name')
+
+        if teamName == home_team:
+            response_text1 = 'The last opponent was ' + away_team + '.'
+            response_text2 = home_team + ' faced ' + away_team + ' in their last game.'
+            response_text3 = home_team + ' played against ' + away_team+ ' in the recent match.'
+            response_text = random.choice([response_text1, response_text2, response_text3])
+        else:
+            response_text1 = 'The last opponent was ' + home_team + '.'
+            response_text2 = away_team + ' faced ' + home_team + ' in their last game.'
+            response_text3 = away_team + ' played against ' + home_team+ ' in the recent match.'
+            response_text = random.choice([response_text1, response_text2, response_text3])
+
+    # For record info
+    elif 'winlossrecord' in parameter_list:
+        conn.request("GET", f"/v3/teams/statistics?{query_string}", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        record_data = json.loads(data)['response']['fixtures']
+
+        record_values = []
+        record_keys = []
+        for key in record_data:
+            inner_dict = record_data[key]
+            record_values = record_values + [inner_dict.get('total')]
+            record_keys = record_keys + [key]
+
+        response_text1 = 'The record for the team is, ' + record_keys[1] + ': ' + str(record_values[1]) + ', ' + record_keys[2] + ': ' + str(record_values[2]) + ', ' + record_keys[3] + ': ' + str(record_values[3]) + '.'
+        response_text2 = teamName + 'has the following record: ' + record_keys[1] + ': ' + str(record_values[1]) + ', ' + record_keys[2] + ': ' + str(record_values[2]) + ', ' + record_keys[3] + ': ' + str(record_values[3]) + '.'
+        response_text3 = 'The record for the team ' + teamName + ' is as follows: ' + record_keys[1] + ': ' + str(record_values[1]) + ', ' + record_keys[2] + ': ' + str(record_values[2]) + ', ' + record_keys[3] + ': ' + str(record_values[3]) + '.'
+        response_text = random.choice([response_text1, response_text2, response_text3])
+    
+    # For playingnow info
+    elif 'playingnow' in parameter_list:
+        conn.request("GET", f"/v3/fixtures?{query_string}&next=1&status=NS", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        next_game_fixture_data = json.loads(data)['response']
+
+        next_game_date_iso = next_game_fixture_data[0].get('fixture').get('date')
+        dt_object = datetime.fromisoformat(next_game_date_iso)
+        next_game_date = dt_object.strftime('%d %B %Y')
+        next_venue_name = next_game_fixture_data[0].get('fixture').get('venue').get('name')
+        next_venue_city = next_game_fixture_data[0].get('fixture').get('venue').get('city')
+        next_home_team = next_game_fixture_data[0].get('teams').get('home').get('name')
+        next_away_team = next_game_fixture_data[0].get('teams').get('away').get('name')
+
+        if date.today().strftime('%d %B %Y') == next_game_date:
+            if next_home_team == teamName:
+                response_text = 'Yes, the team is playing today in ' + next_venue_name + ', ' + next_venue_city + ' against ' + next_away_team + '.'
+            else:
+                response_text = 'Yes, the team is playing today in ' + next_venue_name + ', ' + next_venue_city + ' against ' + next_home_team + '.'
+
+        else:
+            if next_home_team == teamName:
+                response_text = 'No, the team is not playing today. The next game is on ' + next_game_date + ' at ' + next_venue_name + ', ' + next_venue_city + ' against ' + next_away_team + '.'
+            else:
+                response_text = 'No, the team is not playing today. The next game is on ' + next_game_date + ' at ' + next_venue_name + ', ' + next_venue_city + ' against ' + next_home_team + '.'
+    
+    # For league position info
+    elif 'leagueposition' in parameter_list:
+        conn.request("GET", f"/v3/standings?{query_string}", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        league_position = str(json.loads(data)['response'][0].get('league').get('standings')[0][0].get('rank'))
+        response_text1 = 'The current position of the team ' + teamName + ' in the premier league is ' + league_position + '.'
+        response_text2 = teamName + ' is currently ranked ' + league_position + ' in the Premier League.'
+        response_text3 = teamName + ' is positioned at ' + league_position + ' in the Premier League standings.'
+        response_text = random.choice([response_text1, response_text2, response_text3])
+
+    # For next opponent info
+    elif 'nextopponent' in parameter_list:
+        conn.request("GET", f"/v3/fixtures?{query_string}&next=1&status=NS", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        next_game_fixture_data = json.loads(data)['response'][0]
+        next_home_team = next_game_fixture_data.get('teams').get('home').get('name')
+        next_away_team = next_game_fixture_data.get('teams').get('away').get('name')
+        if teamName == next_home_team:
+            response_text1 = teamName + ' is playing against ' + next_away_team + ' in the upcoming match.'
+            response_text2 = 'The upcoming match for ' + teamName + ' will be against ' + next_away_team + '.'
+            response_text3 = 'The next opponent for ' + teamName + ' is ' + next_away_team + ' in the upcoming match.'
+            response_text = random.choice([response_text1, response_text2, response_text3])
+        else:
+            response_text = teamName + ' is playing against ' + next_home_team + ' in the upcoming match.'
+            response_text2 = 'The upcoming match for ' + teamName + ' will be against ' + next_home_team + '.'
+            response_text3 = 'The next opponent for ' + teamName + ' is ' + next_home_team + ' in the upcoming match.'
+            response_text = random.choice([response_text1, response_text2, response_text3])
+
+    # For number of gmaes played info
+    elif 'numgamesplayed' in parameter_list:
+        conn.request("GET", f"/v3/teams/statistics?{query_string}", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        games_played = str(json.loads(data)['response'].get('fixtures').get('played').get('total'))
+        response_text1 = teamName + ' has played ' + games_played + ' matches in the Premier League.'
+        response_text2 = 'The number of matches played by ' + teamName + 'in the Premier League is ' + games_played + '.'
+        response_text3 = 'In the Premier League, ' + teamName + 'as participated in ' + games_played + ' matches so far.'
+        response_text = random.choice([response_text1, response_text2, response_text3])
+    
+    # For next game date info
+    elif 'nextgamedate' in parameter_list:
+        conn.request("GET", f"/v3/fixtures?{query_string}&next=1&status=NS", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        next_game_fixture_data = json.loads(data)['response'][0]
+        next_game_date_iso = next_game_fixture_data.get('fixture').get('date')
+        dt_object = datetime.fromisoformat(next_game_date_iso)
+        next_game_date = dt_object.strftime('%d %B %Y')
+        response_text1 = 'The next game is on ' + next_game_date + '.'
+        response_text2 = 'The upcoming match for ' + teamName + ' is on ' + next_game_date + '.'
+        response_text3 = teamName + ' is set to play their next game on ' + next_game_date + '.'
+        response_text = random.choice([response_text1, response_text2, response_text3])
+
+    # If team is not there in the list
+    else:
+        response_text = 'I did not get you. Could you please repeat the question?'
+        
+        
+    jsonResponse = {
+        'fulfillment_response': {
+            'messages': [
+                {
+                    'text': {
+                       'text': [response_text]
+                    }
+                }
+            ]
+        }
+    }
+
+    return json.dumps(jsonResponse)
